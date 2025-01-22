@@ -6,7 +6,14 @@ import { saveAs } from "file-saver";
 function App() {
   const [file, setFile] = useState(null);
   const [encryptedFile, setEncryptedFile] = useState(null);
-  const key = "1234567890"; // key for encryption
+
+  const generateRandomKey = () => {
+    const array = new Uint8Array(16);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  };
+
+  const key = generateRandomKey(); // key for encryption
 
   useEffect (()  =>  {
     const  fetchHelloWorld  =  async ()  =>  {
