@@ -43,3 +43,12 @@ export const updateNote = async (id, title, content) => {
         throw new Error(error.response ? error.response.data.error : error.message);
     }
 };
+
+export const shareNote = async (noteId, userIds) => {
+    try {
+        const response = await axios.post(`${API_URL}/share`, { noteId, userIds });
+        return response; // Trả về dữ liệu ghi chú sau khi chia sẻ
+    } catch (error) {
+        throw new Error(error.response ? error.response.data.error : error.message);
+    }
+};

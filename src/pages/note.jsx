@@ -3,19 +3,23 @@ import { Button, Container, Typography, Alert, List, ListItem, ListItemText, Dia
 import { createNote, getNotes, deleteNote, updateNote } from '../util/noteApi';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit'; // Thêm icon chỉnh sửa
+import EditIcon from '@mui/icons-material/Edit'; 
+import ShareNoteModal from '../components/shareNoteModal';
+import ShareIcon from '@mui/icons-material/Share'; 
 
 const NotePage = () => {
     const [idUser, setIdUser] = useState(null);
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
-    const [openEditDialog, setOpenEditDialog] = useState(false); // Trạng thái cho dialog chỉnh sửa
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openShareDialog, setOpenShareDialog] = useState(false);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-    const [editNoteId, setEditNoteId] = useState(null); // ID của ghi chú đang chỉnh sửa
+    const [editNoteId, setEditNoteId] = useState(null);  // Dùng cho việc chỉnh sửa
+    const [shareNoteId, setShareNoteId] = useState(null); // Dùng cho việc chia sẻ
 
     useEffect(() => {
         const storedIdUser = localStorage.getItem('id_user');
@@ -84,10 +88,21 @@ const NotePage = () => {
             const data = await updateNote(editNoteId, title, content);
             setSuccessMessage('Note updated successfully!');
             setNotes(prevNotes => prevNotes.map(note => note._id === editNoteId ? data : note)); 
-            setOpenEditDialog(false); // Đóng dialog sau khi cập nhật
+            setOpenEditDialog(false);
         } catch (error) {
             setError('Error updating note.');
         }
+    };
+
+    const handleOpenShareModal = (noteId) => {
+        setShareNoteId(noteId);  // Cập nhật noteId cho việc chia sẻ
+        setOpenShareDialog(true);  // Mở modal chia sẻ
+    };
+
+    const handleShareSuccess = () => {
+        // Khi chia sẻ thành công, cập nhật lại danh sách ghi chú và thông báo
+        fetchNotes(idUser);  // Tải lại ghi chú ngay khi chia sẻ thành công
+        setSuccessMessage('Note shared successfully!');
     };
 
     return (
@@ -127,15 +142,30 @@ const NotePage = () => {
                                     </IconButton>
                                     <IconButton
                                         color="primary"
-                                        onClick={() => handleEditNote(note)} // Mở dialog chỉnh sửa khi nhấn vào
+                                        onClick={() => handleEditNote(note)}
                                     >
                                         <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="default"
+                                        onClick={() => handleOpenShareModal(note._id)} // Mở modal chia sẻ ghi chú
+                                    >
+                                        <ShareIcon />
                                     </IconButton>
                                 </ListItem>
                             ))}
                         </List>
                     )}
                 </Box>
+            )}
+
+            {/* Modal Chia Sẻ Note */}
+            {openShareDialog && (
+                <ShareNoteModal
+                    noteId={shareNoteId}  // Truyền shareNoteId cho modal chia sẻ
+                    onClose={() => setOpenShareDialog(false)}
+                    onSuccess={handleShareSuccess}  // Cập nhật UI ngay khi chia sẻ thành công
+                />
             )}
 
             {/* Dialog để tạo mới ghi chú */}
