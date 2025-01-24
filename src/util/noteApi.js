@@ -24,3 +24,22 @@ export const getNotes = async (idUser) => {
         throw new Error(error.response ? error.response.data.error : error.message);
     }
 };
+
+export const deleteNote = async (id) => {
+    try {
+        const response = await axios.delete(API_URL, { data: { id } }); // Gửi id trong body
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response ? error.response.data.error : error.message);
+    }
+};
+
+// API cập nhật ghi chú
+export const updateNote = async (id, title, content) => {
+    try {
+        const response = await axios.put(`${API_URL}`, { id, title, content });
+        return response;  // Trả về dữ liệu ghi chú đã được cập nhật
+    } catch (error) {
+        throw new Error(error.response ? error.response.data.error : error.message);
+    }
+};
