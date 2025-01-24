@@ -12,8 +12,8 @@ const Header = () => {
         },
 
         {
-            label: <Link to={"/user"}>Users</Link>,
-            key: 'user',
+            label: <Link to={"/note"}>Notes</Link>,
+            key: 'note',
             icon: <MailOutlined />,
         },
 
