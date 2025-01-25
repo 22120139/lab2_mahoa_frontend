@@ -57,6 +57,26 @@ const ShareNoteModal = ({ noteId, onClose, onSuccess }) => {
     //         setMessage('User not found');
     //     }
     // };
+
+    const storedIdUser = localStorage.getItem('id_user');
+
+    
+    const fetchNotesForShare = async (storedIdUser) => {
+            try {
+                setLoading(true);
+                const data = await getNotes(storedIdUser);
+                if (Array.isArray(data)) {
+                    setNotes(data);
+                } else {
+                    setNotes([]);
+                    setError("Failed to load notes. Data is not in expected format.");
+                }
+            } catch (error) {
+                setError("Error fetching notes.");
+            } finally {
+                setLoading(false);
+            }
+    };
     
 
     const handleShare = async () => {
@@ -90,8 +110,6 @@ const ShareNoteModal = ({ noteId, onClose, onSuccess }) => {
                 onSuccess(); // Cập nhật giao diện nếu chia sẻ thành công
                 onClose();   // Đóng modal sau khi chia sẻ thành công
     
-                // Tải lại ghi chú sau khi chia sẻ thành công
-                fetchNotes(idUser);  // Gọi lại fetchNotes để tải lại danh sách ghi chú
             } catch (error) {
                 setMessage('Failed to share note');
                 console.error('Error sharing note:', error);
