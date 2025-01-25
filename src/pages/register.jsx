@@ -2,14 +2,15 @@ import React from 'react';
 import { Button, Form, Input, notification } from 'antd';
 import { createUserApi } from '../util/api';
 import { useNavigate } from 'react-router-dom';
+import CryptoJS from 'crypto-js';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
         const { name, email, password } = values;
-
-        const res = await createUserApi(name, email, password);
+        const privateKey = CryptoJS.lib.WordArray.random(128 / 8).toString(CryptoJS.enc.Hex);
+        const res = await createUserApi(name, password, privateKey);
 
         if (res) {
             notification.success({

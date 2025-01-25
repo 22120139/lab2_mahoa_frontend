@@ -1,5 +1,5 @@
 import axios from './axios.customize';
-import CryptoJS from 'crypto-js';
+import CryptoJS, { enc } from 'crypto-js';
 
 const API_URL = 'http://localhost:8080/v1/api/notes'; // Thay bằng URL của bạn
 
@@ -29,10 +29,11 @@ const API_URL = 'http://localhost:8080/v1/api/notes'; // Thay bằng URL của b
 
 
 // Khóa AES từ môi trường (cần đảm bảo bạn đã định nghĩa trong .env)
-const encryptionKey = "your-secret-key";
+const encryptionKey = localStorage.getItem('private_key');
 
 // Hàm mã hóa
 const encryptData = (data) => {
+    console.log("Data before encrypt:", data, encryptionKey);
     return CryptoJS.AES.encrypt(data, encryptionKey).toString();
 };
 
@@ -68,9 +69,9 @@ export const createNote = async (idUser, title, content) => {
 export const getNotes = async (idUser) => {
     try {
         const response = await axios.get(API_URL, {
-            params: { idUser },
+            params: { idUser } // Truyền idUser qua query parameters
         });
-
+        console.log("Response data:", response); // Kiểm tra dữ liệu trả về từ API
         // Giải mã dữ liệu trước khi trả về
         const decryptedNotes = response.map((note) => ({
             ...note,

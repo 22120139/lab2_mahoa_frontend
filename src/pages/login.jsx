@@ -17,10 +17,12 @@ const LoginPage = () => {
             console.log("API Response:", res); // Log phản hồi từ API
 
             if (res && res.EC === 0) {
+                console.log("Login success:", res.data);
                 // Lưu id_user và access_token vào localStorage
                 localStorage.setItem("username", res.data.user.name);
                 localStorage.setItem("id_user", res.data.user.id);
                 localStorage.setItem("access_token", res.data.token);
+                localStorage.setItem("private_key", res.data.user.AES.privateKey);
 
                 notification.success({
                     message: "LOGIN SUCCESS",
