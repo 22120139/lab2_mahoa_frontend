@@ -24,7 +24,11 @@ const RegisterPage = () => {
                 description: "error"
             })
         }
+    };
 
+    // Điều hướng đến trang đăng nhập
+    const goToLogin = () => {
+        navigate("/login");
     };
 
     return (
@@ -40,7 +44,6 @@ const RegisterPage = () => {
                 style={{
                     maxWidth: 600,
                 }}
-
                 onFinish={onFinish}
                 autoComplete="off"
                 layout='vertical'
@@ -84,10 +87,16 @@ const RegisterPage = () => {
                     <Input />
                 </Form.Item>
 
-                <Form.Item
-                >
-                    <Button type="primary" htmlType="submit">
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" block>
                         Submit
+                    </Button>
+                </Form.Item>
+
+                {/* Nút đăng nhập */}
+                <Form.Item>
+                    <Button type="link" onClick={goToLogin} block>
+                        Already have an account? Log in
                     </Button>
                 </Form.Item>
             </Form>

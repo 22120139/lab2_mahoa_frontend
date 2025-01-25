@@ -106,7 +106,7 @@ const NotePage = () => {
     };
 
     return (
-        <Container maxWidth="md" style={{ marginTop: '20px' }}>
+        <Container maxWidth="md" style={{ marginTop: '60px' }}> {/* Đã thêm marginTop ở đây */}
             {error && <Alert severity="error" style={{ marginBottom: '10px' }}>{error}</Alert>}
             {successMessage && <Alert severity="success" style={{ marginBottom: '10px' }}>{successMessage}</Alert>}
 
