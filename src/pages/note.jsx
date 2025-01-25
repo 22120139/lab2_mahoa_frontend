@@ -3,23 +3,19 @@ import { Button, Container, Typography, Alert, List, ListItem, ListItemText, Dia
 import { createNote, getNotes, deleteNote, updateNote } from '../util/noteApi';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import ShareNoteModal from '../components/shareNoteModal';
-import ShareIcon from '@mui/icons-material/Share';
+import EditIcon from '@mui/icons-material/Edit'; // Thêm icon chỉnh sửa
 
 const NotePage = () => {
     const [idUser, setIdUser] = useState(null);
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
-    const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [openShareDialog, setOpenShareDialog] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false); // Trạng thái cho dialog chỉnh sửa
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-    const [editNoteId, setEditNoteId] = useState(null);
-    const [shareNoteId, setShareNoteId] = useState(null);
+    const [editNoteId, setEditNoteId] = useState(null); // ID của ghi chú đang chỉnh sửa
 
     useEffect(() => {
         const storedIdUser = localStorage.getItem('id_user');
@@ -55,7 +51,7 @@ const NotePage = () => {
             return;
         }
         try {
-            await createNote(idUser, title, content);
+            const data = await createNote(idUser, title, content);
             setSuccessMessage('Note created successfully!');
             setTitle('');
             setContent('');
@@ -68,21 +64,15 @@ const NotePage = () => {
 
     const handleDeleteNote = async (id) => {
         try {
-            await deleteNote(id);
+            await deleteNote(id); 
             setSuccessMessage('Note deleted successfully!');
-            fetchNotes(idUser); // Gọi lại fetchNotes sau khi xóa
+            setNotes(prevNotes => prevNotes.filter(note => note._id !== id)); 
         } catch (error) {
             setError('Error deleting note.');
         }
     };
 
     const handleEditNote = (note) => {
-        if (!note || !note.title || !note.content) {
-            setError("Invalid note selected for editing.");
-            console.error("Invalid note:", note);
-            return;
-        }
-
         setEditNoteId(note._id);
         setTitle(note.title);
         setContent(note.content);
@@ -91,31 +81,17 @@ const NotePage = () => {
 
     const handleUpdateNote = async () => {
         try {
-            await updateNote(editNoteId, title, content);
+            const data = await updateNote(editNoteId, title, content);
             setSuccessMessage('Note updated successfully!');
-            setOpenEditDialog(false);
-
-            // Gọi lại fetchNotes sau khi cập nhật thành công
-            if (idUser) {
-                fetchNotes(idUser);
-            }
+            setNotes(prevNotes => prevNotes.map(note => note._id === editNoteId ? data : note)); 
+            setOpenEditDialog(false); // Đóng dialog sau khi cập nhật
         } catch (error) {
             setError('Error updating note.');
         }
     };
 
-    const handleOpenShareModal = (noteId) => {
-        setShareNoteId(noteId);
-        setOpenShareDialog(true);
-    };
-
-    const handleShareSuccess = () => {
-        fetchNotes(idUser);
-        setSuccessMessage('Note shared successfully!');
-    };
-
     return (
-        <Container maxWidth="md" style={{ marginTop: '60px' }}>
+        <Container maxWidth="md" style={{ marginTop: '20px' }}>
             {error && <Alert severity="error" style={{ marginBottom: '10px' }}>{error}</Alert>}
             {successMessage && <Alert severity="success" style={{ marginBottom: '10px' }}>{successMessage}</Alert>}
 
@@ -140,11 +116,7 @@ const NotePage = () => {
                             {notes.map((note) => (
                                 <ListItem key={note._id} style={{ borderBottom: '1px solid #ddd', padding: '10px 0' }}>
                                     <ListItemText
-                                        primary={
-                                            <Typography variant="h6">
-                                                {note.title}
-                                            </Typography>
-                                        }
+                                        primary={<Typography variant="h6">{note.title}</Typography>}
                                         secondary={<Typography>{note.content}</Typography>}
                                     />
                                     <IconButton
@@ -155,15 +127,9 @@ const NotePage = () => {
                                     </IconButton>
                                     <IconButton
                                         color="primary"
-                                        onClick={() => handleEditNote(note)}
+                                        onClick={() => handleEditNote(note)} // Mở dialog chỉnh sửa khi nhấn vào
                                     >
                                         <EditIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        color="default"
-                                        onClick={() => handleOpenShareModal(note._id)}
-                                    >
-                                        <ShareIcon />
                                     </IconButton>
                                 </ListItem>
                             ))}
@@ -172,14 +138,7 @@ const NotePage = () => {
                 </Box>
             )}
 
-            {openShareDialog && (
-                <ShareNoteModal
-                    noteId={shareNoteId}
-                    onClose={() => setOpenShareDialog(false)}
-                    onSuccess={handleShareSuccess}
-                />
-            )}
-
+            {/* Dialog để tạo mới ghi chú */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Create a New Note</DialogTitle>
                 <DialogContent>
@@ -214,6 +173,7 @@ const NotePage = () => {
                 </DialogActions>
             </Dialog>
 
+            {/* Dialog để chỉnh sửa ghi chú */}
             <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Edit Note</DialogTitle>
                 <DialogContent>
